@@ -20,10 +20,10 @@ Gem::Specification.new do |s|
   s.add_dependency "jquery-rails"
   s.add_dependency "twitter-bootstrap-rails"
 
-#  s.add_development_dependency "sqlite3"
-#  s.add_development_dependency "therubyracer"
-#  s.add_development_dependency "less-rails"
-#  s.add_development_dependency "mysql2"
-#  s.add_development_dependency "ruby-oci8"
-#  s.add_development_dependency "activerecord-oracle_enhanced-adapter"
+  s.add_development_dependency "sqlite3"
+  s.add_development_dependency "therubyracer"
+  s.add_development_dependency "less-rails"
+  s.add_development_dependency "mysql2"
+  s.add_development_dependency "ruby-oci8"
+  s.add_development_dependency "activerecord-oracle_enhanced-adapter"
 end
