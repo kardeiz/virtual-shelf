@@ -1,0 +1,164 @@
+@import "twitter/bootstrap/bootstrap";
+@import "twitter/bootstrap/responsive";
+
+// Set the correct sprite paths
+@iconSpritePath: asset-path("twitter/bootstrap/glyphicons-halflings.png");
+@iconWhiteSpritePath: asset-path("twitter/bootstrap/glyphicons-halflings-white.png");
+
+// Set the Font Awesome (Font Awesome is default. You can disable by commenting below lines)
+// Note: If you use asset_path() here, your compiled bootstrap_and_overrides.css will not
+//       have the proper paths. So for now we use the absolute path.
+@fontAwesomeEotPath: asset-path("fontawesome-webfont.eot?v=3.0.2");
+@fontAwesomeEotPath_iefix: asset-path("fontawesome-webfont.eot?#iefix&v=3.0.2");
+@fontAwesomeWoffPath: asset-path("fontawesome-webfont.woff?v=3.0.2");
+@fontAwesomeTtfPath: asset-path("fontawesome-webfont.ttf?v=3.0.2");
+
+// Font Awesome
+@import "fontawesome";
+
+@import url("//fonts.googleapis.com/css?family=Open+Sans");
+
+// Glyphicons
+//@import "twitter/bootstrap/sprites.less";
+
+// Your custom LESS stylesheets goes here
+//
+// Since bootstrap was imported above you have access to its mixins which
+// you may use and inherit here
+//
+// If you'd like to override bootstrap's own variables, you can do so here as well
+// See http://twitter.github.com/bootstrap/customize.html#variables for their names and documentation
+//
+// Example:
+// @linkColor: #ff0000;
+
+body {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.title-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 12px;
+  max-height: 40px;
+  color: @grayDark;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+.slide {
+  position: relative; 
+  top: 0;
+}
+
+a.arrow {
+  float: none;
+  color: #4d1979;
+  font-size: 3.5em;
+  text-decoration: none;
+  margin-bottom: 20px;
+  max-width: 70px;
+  text-align: center;
+  &:hover {
+    background-color: #eee;
+    color: darken(#4d1979, 10%);
+  }
+  & > .span1 {
+    margin-left: 0;
+  }
+}
+
+.thumbnails-div {
+  margin-left: 0;
+  margin-bottom: -20px;
+  position: relative;
+}
+
+.thumbnails-div .thumbnails {
+  margin-bottom: 0;
+}
+
+.current {
+  border: 1px solid @orange;
+  background-color: @orange;
+}
+
+.cover-holder { 
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  position: relative;
+}
+
+.has-cover { 
+  height: 170px; 
+}
+
+.no-cover { 
+  height: 130px; 
+}
+
+.no-cover-container {
+  height: 170px;
+  position: relative;
+}
+
+.cover-book-generic {
+  background-image: asset-url('virtual_shelf/book.png');
+}
+
+.cover-journal-generic {
+  background-image: asset-url('virtual_shelf/journal.png');
+}
+
+.cover-audio-generic {
+  background-image: asset-url('virtual_shelf/music.png');
+}
+
+.cover-map-generic {
+  background-image: asset-url('virtual_shelf/map.png');
+}
+
+.cover-video-generic {
+  background-image: asset-url('virtual_shelf/video.png');
+}
+
+.cover-file-generic {
+  background-image: asset-url('virtual_shelf/file.png');
+}
+
+.table-div {
+  display: table;
+  margin: 20px auto;
+  border-spacing: 10px 0;
+  table-layout: fixed;
+}
+
+.table-cell-div {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+a.thumbnail {
+  text-decoration: none;
+}
+
+.title-overlay { text-align: center; }
+
+.qtip-content hr { 
+  margin: 10px 0;
+}
+
+.qtip-content p { 
+  margin: 0 0 5px;
+  font-size: 12px;
+}
+
+@media (max-width: 767px) {   
+  .thumbnails-div-parent {
+    width: 100%;
+  }
+}
+

@@ -1,0 +1,24 @@
+<div class="table-cell-div thumbnails-div-parent">
+  <div class="span10 thumbnails-div">
+    <div class="slide">
+      <ul class="thumbnails">
+        <% records.each do |record| %>
+          <li class="span2">
+            <%= link_to record.lib_link, :class => link_class(record.document_number), :target => '_top', :data => record.hash_for_js do %>
+              <% if record.has_cover? %>
+                <%= content_tag "div", '', :class => "cover-holder has-cover", :style => record.cover_background_image %>
+              <% else %>
+                <div class="no-cover-container">
+                  <%= content_tag "div", '', :class => cover_holder_class(record.format) %>
+                  <div class="title-overlay">
+                    <span><%= truncate(record.title, :length => 50) %></span>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>     
+    </div>
+  </div>
+</div>

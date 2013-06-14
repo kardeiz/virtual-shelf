@@ -1,0 +1,10 @@
+<%= render :partial => 'include_periodicals' %>
+<div class="table-div">
+  <%= link_to before_record_path(@records.first.document_number), :class => "table-cell-div arrow arrow-left" do %>
+    <div class="span1"><i class="icon-chevron-left icon-large"></i></div>
+  <% end %>
+  <%= render 'thumbnails', :records => @records %>
+  <%= link_to after_record_path(@records.last.document_number), :class => "table-cell-div arrow arrow-right" do %>
+    <div class="span1"><i class="icon-chevron-right icon-large"></i></div>
+  <% end %>
+</div>
