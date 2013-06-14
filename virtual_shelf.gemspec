@@ -5,7 +5,7 @@ require "virtual_shelf/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "virtual_shelf"
+  s.name        = "virtual-shelf"
   s.version     = VirtualShelf::VERSION
   s.authors     = ["Jacob Brown"]
   s.email       = ["j.h.brown@tcu.edu"]
