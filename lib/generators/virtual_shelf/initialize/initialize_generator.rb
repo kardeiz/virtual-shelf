@@ -8,8 +8,8 @@ module VirtualShelf
       end
       
       def write_line_to_routes
-        line = "Rails.application.routes.draw do"
-        gsub_file 'config/routes.rb', /(#{Regexp.escape(line)})/mi do |match|
+        line = /(.*?\.application\.routes\.draw do)/mi
+        gsub_file 'config/routes.rb',line do |match|
           "#{match}\n\n  mount VirtualShelf::Engine => \"/\""
         end
       end
