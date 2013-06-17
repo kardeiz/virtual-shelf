@@ -65,7 +65,7 @@ Assuming everything has worked so far, you can visit your virtual catalog by run
 
   $ rails server
 
-and visiting localhost:3000/records/<document number> in your browser.
+and visiting localhost:3000/records/<document number> in your browser. If you see an error about not finding a class, try adding +config.cache_store = :null_store+ to your +config/environments/development.rb+ file.
 
 You will notice that these pages lack any branding. This is because (at TCU), the VirtualShelf application is configured to load within an iframe within library catalog pages.
 
