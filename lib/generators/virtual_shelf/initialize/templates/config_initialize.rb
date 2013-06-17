@@ -1,5 +1,3 @@
-require 'virtual_shelf'
-
 VirtualShelf.config do |config|
   config.catalog_link = 'http://libweb.lib.tcu.edu/F/?func=direct&doc_library=TCU01&doc_number='
   config.copyright_statement = '&copy; TCU Library 2013'

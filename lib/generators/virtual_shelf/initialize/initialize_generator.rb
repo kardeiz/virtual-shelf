@@ -8,10 +8,15 @@ module VirtualShelf
       end
       
       def write_line_to_routes
-        line = /(.*?\.routes\.draw do)/mi
-        gsub_file 'config/routes.rb',line do |match|
-          "#{match}\n\n  mount VirtualShelf::Engine => \"/\""
-        end
+        insert_into_file 'config/routes.rb', 
+          %Q{\n  mount VirtualShelf::Engine => "/"},
+          :after => /.*?\.routes\.draw do\n/
+        
+        insert_into_file 'config/application.rb', 
+          %Q{\nrequire 'virtual_shelf'\nENV['NLS_LANG'] ||= "AMERICAN_AMERICA.UTF8"\n}, 
+          :after => /require 'rails\/all'\n/
+        
+        
       end
       
     end
