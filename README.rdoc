@@ -1,3 +1,58 @@
-= VirtualShelf
+== VirtualShelf
 
-This project rocks and uses MIT-LICENSE.
+A virtual shelf browse application for (Aleph) library catalogs as a Rails Engine.
+
+== Installation
+
+_Note 1: these instructions assume that you will be creating a new Rails application to use with this engine. This engine can be used with an existing Rails application, but doing so will require manual changes to +routes.rb+ to change the mount path._
+
+_Note 2: Some familiarity with Rails may be required to set up this application._
+
+First, create a new Rails application:
+
+  $ rails new MyApp
+
+The VirtualShelf engine requires Rails ~> 3.2.13, but will probably work with other versions.
+
+Enter your Rails app directory and take a look at your application files:
+
+  $ cd MyApp
+
+Edit your +Gemfile+ by adding this line at the end of the file
+
+  gem 'virtual-shelf', :git => 'git://github.com/kardeiz/virtual-shelf.git'
+
+You will also want to install gems for your database connection (e.g., 'mysql2' or 'sqlite3')
+
+Save your file and install your gems:
+
+  $ bundle install
+
+Next, initialize the engine:
+
+  $ rails generate virtual_shelf:initialize
+
+This command copies over an initialization file to +config/initializers/virtual_shelf_initialize.rb+, adds a line to +config/routes.rb+ to mount the engine at the document root, and loads the engine files in +config/application.rb+.
+
+Next, copy over the database migration files (assuming you have added the gems necessary for your database connection and have set up +config/database.yml+ as needed), and run the migrations:
+
+  $ rake virtual_shelf:install:migrations
+  $ rake db:migrate
+
+Take a look at +config/initializers/virtual_shelf_initialize.rb+ and reset config values to ones appropriate for your catalog. 
+
+Set up +config/database.yml+ to connect to your Aleph catalog database, naming the connection +oracle_db+. You will probably need to add the 'ruby-oci8' and 'activerecord-oracle_enhanced-adapter' gems to your +Gemfile+.
+
+Assuming everything is configured correctly, you can then load your catalog records into the VirtualShelf database:
+
+  $ rake virtual_shelf:load_records
+
+Note that there is also a +load_recent_records+ task that will load all records created in the last week. You may wish to schedule this as a weekly +cron+ task.
+
+This task will take a long time (hours), due mostly to a non-conventional join on the Z11 and Z30 tables. Pull requests that improve this step are more than welcome.
+
+
+  
+
+
+This project uses the license specified in MIT-LICENSE.
