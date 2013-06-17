@@ -4,9 +4,9 @@ A virtual shelf browse application for (Aleph) library catalogs as a Rails Engin
 
 == Installation
 
-_Note 1: these instructions assume that you will be creating a new Rails application to use with this engine. This engine can be used with an existing Rails application, but doing so will require manual changes to +routes.rb+ to change the mount path._
+<em>Note 1: these instructions assume that you will be creating a new Rails application to use with this engine. This engine can be used with an existing Rails application, but doing so will require manual changes to +routes.rb+ to change the mount path.</em>
 
-_Note 2: Some familiarity with Rails may be required to set up this application._
+<em>Note 2: Some familiarity with Rails may be required to set up this application.</em>
 
 First, create a new Rails application:
 
