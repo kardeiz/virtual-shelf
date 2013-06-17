@@ -51,7 +51,7 @@ This task will take a long time (hours), due mostly to a non-conventional join o
 
 Note that there is also a +load_recent_records+ task that will load all records created in the last week. You may wish to schedule this as a weekly +cron+ task.
 
-This application is designed to use the Open Library Cover thumbnails, made available via {their website}[http://openlibrary.org/dev/docs/api/covers]. This application assumed the use of the "medium" sized thumbnails, although other sizes could be made to work with some style changes.
+This application is designed to use the Open Library Cover thumbnails, made available via {their website}[http://openlibrary.org/dev/docs/api/covers]. This application assumes the use of the "medium" sized thumbnails, although other sizes could be made to work with some style changes.
 
 Download the covers and place them on an accessible server (can be separate from this application). Point the application to the location of your covers by setting the appropriate value for +config.thumbnails_base_url+ in +config/initializers/virtual_shelf_initialize.rb+.
 
