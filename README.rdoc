@@ -2,7 +2,7 @@
 
 A virtual shelf browse application for (Aleph) library catalogs as a Rails Engine.
 
-== Installation
+== Installation and Configuration
 
 <em>Note 1: these instructions assume that you will be creating a new Rails application to use with this engine. This engine can be used with an existing Rails application, but doing so will require manual changes to +routes.rb+ to change the mount path.</em>
 
@@ -47,12 +47,44 @@ Assuming everything is configured correctly, you can then load your catalog reco
 
   $ rake virtual_shelf:load_records
 
-Note that there is also a +load_recent_records+ task that will load all records created in the last week. You may wish to schedule this as a weekly +cron+ task.
-
 This task will take a long time (hours), due mostly to a non-conventional join on the Z11 and Z30 tables. Pull requests that improve this step are more than welcome.
 
+Note that there is also a +load_recent_records+ task that will load all records created in the last week. You may wish to schedule this as a weekly +cron+ task.
 
-  
+This application is designed to use the Open Library Cover thumbnails, made available via {their website}[http://openlibrary.org/dev/docs/api/covers]. This application assumed the use of the "medium" sized thumbnails, although other sizes could be made to work with some style changes.
 
+Download the covers and place them on an accessible server (can be separate from this application). Point the application to the location of your covers by setting the appropriate value for +config.thumbnails_base_url+ in +config/initializers/virtual_shelf_initialize.rb+.
+
+Download and unzip the Open Library mappings TSV file (from their website). Then run:
+
+  $ rake filename="<path to your OL mappings file>" virtual_shelf:load_covers
+
+This process will take a long time. It may be faster to convert the TSV file into an appropriately manipulated CSV file to load directly into your database.
+
+Assuming everything has worked so far, you can visit your virtual catalog by running
+
+  $ rails server
+
+and visiting localhost:3000/records/<document number> in your browser.
+
+You will notice that these pages lack any branding. This is because (at TCU), the VirtualShelf application is configured to load within an iframe within library catalog pages.
+
+To load the VirtualShelf application in a similar manner for your catalog, add the following line to the appropriate template file:
+
+  <script src="<your site's url>/virtual_shelf/catalog_load.js" type="text/javascript"></script>
+
+You will also want to add a link to trigger the iframe load/display as follows:
+
+  <a href="https://virtualshelf.tcu.edu/records/<document_number>" class="virtual-shelf">Virtual Browse</a>
+
+where +document_number+ is generated dynamically by your catalog system.
+
+== Notices
+
+This application comes with no warranty, although you are welcome to open an issue at any time.
+
+This application uses generic cover icons from Font Awesome. These can be overridden by placing appropriately named files in +app/assets/images/virtual_shelf/+.
+
+Pull requests are welcome, especially if you are a Rails developer and notice areas for improvement.
 
 This project uses the license specified in MIT-LICENSE.
