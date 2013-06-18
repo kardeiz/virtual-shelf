@@ -55,7 +55,7 @@ In your +Gemfile+, add gems for the Oracle connection, e.g.:
 In +config/database.yml+, add configuration settings for your Aleph catalog database connection, naming the connection +oracle_db+. It should look something like this:
 
   oracle_db:
-    database: servername.whatever:1521/aleph21
+    database: servername.tld:9999/whatever
     pool: 5
     timeout: 5000
     username: username
