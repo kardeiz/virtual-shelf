@@ -82,7 +82,7 @@ Download the covers and place them on an accessible server (can be separate from
 
 Download and unzip the Open Library mappings TSV file (from their website). Then run:
 
-  $ rake filename="<path to your OL mappings file>" virtual_shelf:load_covers
+  $ rake filename="path_to_open_library_mappings_file>" virtual_shelf:load_covers
 
 This process will take a long time. It may be faster to convert the TSV file into an appropriately manipulated CSV file to load directly into your database.
 
@@ -92,7 +92,7 @@ Assuming everything has worked so far, you can visit your virtual catalog by run
 
   $ rails server
 
-and visiting localhost:3000/records/<document number> in your browser. If you see an error about not finding a class, try adding <tt>config.cache_store = :null_store</tt> to your +config/environments/development.rb+ file.
+and visiting <tt>localhost:3000/records/<document_number></tt> in your browser. If you see an error about not finding a class, try adding <tt>config.cache_store = :null_store</tt> to your +config/environments/development.rb+ file.
 
 == Loading as an Iframe
 
@@ -100,13 +100,13 @@ You will notice that these pages lack any branding. This is because (at TCU), th
 
 To load the VirtualShelf application in a similar manner for your catalog, add the following line to the appropriate template file:
 
-  <script src="<your site's url>/virtual_shelf/catalog/load.js" type="text/javascript"></script>
+  <script src="http://yoursite.tld/catalog/load.js" type="text/javascript"></script>
 
 This file sets up a JQuery UI modal and handles a click event (loading page as an iframe in this modal).
 
 You will also want to add a link to trigger the iframe load/display as follows:
 
-  <a href="https://virtualshelf.tcu.edu/records/<document_number>" class="virtual-shelf">Virtual Browse</a>
+  <a href="http://yoursite.tld/records/<document_number>" class="virtual-shelf">Virtual Browse</a>
 
 where +document_number+ is generated dynamically by your catalog system.
 
