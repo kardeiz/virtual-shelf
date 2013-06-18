@@ -1,6 +1,13 @@
 == VirtualShelf
 
-A virtual shelf browse application for (Aleph) library catalogs as a Rails Engine.
+A Rails Engine for building virtual shelf browse applications for (Aleph based) library catalogs.
+
+== Description
+
+This engine provides a virtual shelf browse mechanism. 
+
+https://github.com/kardeiz/virtual-shelf/blob/master/screenshot.png
+
 
 == Installation and Initial Configuration
 
