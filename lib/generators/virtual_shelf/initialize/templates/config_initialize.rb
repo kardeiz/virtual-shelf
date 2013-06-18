@@ -3,7 +3,7 @@ VirtualShelf.config do |config|
   config.copyright_statement = '&copy; TCU Library 2013'
   config.cache_timeout = 30.minutes
   config.thumbnails_base_url = lambda {|cid_tag|
-    "http://specoll.lib.tcu.edu/virtualshelf/covers_#{cid_tag[0..3]}_#{cid_tag[4..5]}/#{cid_tag}-M.jpg" 
+    "http://servername.tld/covers_#{cid_tag[0..3]}_#{cid_tag[4..5]}/#{cid_tag}-M.jpg" 
   }
   config.z11_table_name = 'TCU01.Z11'
   config.z13_table_name = 'TCU01.Z13'
@@ -16,9 +16,5 @@ VirtualShelf.config do |config|
   config.z13u_title1_field = 'z13u_user_defined_6'
   config.z13u_title2_field = 'z13u_user_defined_7'
   config.z13u_author_field = 'z13u_user_defined_8'
-  config.z13u_ldr_field = 'z13u_user_defined_9'
-  
-  config.icons = {
-    
-  }  
+  config.z13u_ldr_field = 'z13u_user_defined_9'  
 end
