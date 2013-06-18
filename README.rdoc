@@ -109,6 +109,18 @@ where +document_number+ is generated dynamically by your catalog system.
 
 This application comes with no warranty, although you are welcome to open an issue at any time.
 
+For more advanced configuration options, feel free to fork the gem or make local edits. You can do this by following these steps:
+
+1. Download the repository: <tt>$ cd .. && git clone git://github.com/kardeiz/virtual-shelf.git</tt>
+2. Make your changes.
+3. Change the line in +Gemfile+ from <tt>gem 'virtual-shelf', :git => 'git://github.com/kardeiz/virtual-shelf.git'</tt> to <tt>gem 'virtual-shelf', :path => '../virtual-shelf'</tt>
+
+Assets can be overriden by creating files at +app/assets/images/virtual_shelf/+, +app/assets/javascripts/virtual_shelf/+, or +app/assets/stylesheets/virtual_shelf/+.
+
+You may also request additional configuration options as issues.
+
+This application requires the {Twitter Bootstrap Rails}[https://github.com/seyhunak/twitter-bootstrap-rails] gem. This gem (v. 2.2.6, since 2.2.7 was having issues at time of writing) will be installed automatically.
+
 This application uses generic cover icons from {Font Awesome}[http://fortawesome.github.io/Font-Awesome/]. These can be overridden by placing appropriately named files in +app/assets/images/virtual_shelf/+.
 
 This application contains a controller and JavaScript to load cover thumbnails from the Google Books API. It is your responsibility to ensure that your application complies with the {Google Books Terms of Service}[https://developers.google.com/books/terms].
