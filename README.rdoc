@@ -6,7 +6,7 @@ A Rails Engine for building virtual shelf browse applications for (Aleph based) 
 
 This engine provides a virtual shelf browse mechanism. 
 
-<image src="https://github.com/kardeiz/virtual-shelf/blob/master/screenshot.png"/>
+<image src=https://github.com/kardeiz/virtual-shelf/blob/master/screenshot.png>
 
 
 == Installation and Initial Configuration
