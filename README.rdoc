@@ -26,6 +26,11 @@ You will also want to install gems for your database connection, e.g.:
   gem 'mysql2'
   gem 'sqlite3'
 
+You will also need to add some other gems (for asset management):
+
+  gem 'therubyracer'
+  gem 'less-rails'
+
 Save your file and install your gems:
 
   $ bundle install
@@ -51,11 +56,6 @@ In your +Gemfile+, add gems for the Oracle connection, e.g.:
 
   gem 'ruby-oci8'
   gem 'activerecord-oracle_enhanced-adapter'
-
-You will also need to add some other asset management gems:
-
-  gem 'therubyracer'
-  gem 'less-rails'
 
 In +config/database.yml+, add configuration settings for your Aleph catalog database connection, naming the connection +oracle_db+. It should look something like this:
 
