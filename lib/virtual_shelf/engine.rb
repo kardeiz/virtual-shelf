@@ -6,5 +6,12 @@ module VirtualShelf
       app.config.assets.precompile += %w(virtual_shelf/catalog/load.js)
     end
     
+    def self.mounted_path
+      route = Rails.application.routes.routes.detect do |route|
+        route.app == self
+      end
+      route && route.path
+    end
+    
   end
 end

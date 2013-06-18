@@ -17,7 +17,7 @@ module VirtualShelf
       render :nothing => true and return if ids.nil?        
       @results = Rails.cache.fetch("cover_cache_#{ids}", :expires_in => VirtualShelf.config.cache_timeout) do
         uri = URI.parse("http://books.google.com/books?jscmd=viewapi&callback=_&bibkeys=#{URI.escape(params[:ids])}")
-        response = JSON.parse(get_processed_response_body(uri))
+        response = JSON.parse(get_processed_response_body(uri)) rescue nil
         get_thumbnail_urls(response) if response
       end    
       render :json => @results  

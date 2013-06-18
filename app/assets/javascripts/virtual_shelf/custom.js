@@ -41,9 +41,12 @@ $(document).ready(function() {
       var that = $(this);      
       var isbn = that.data('isbn') == null ? null : "ISBN:" + that.data('isbn');
       var oclc = that.data('oclc') == null ? null : "OCLC:" + that.data('oclc');      
+      console.log(isbn);
       if (isbn || oclc) { return isbn || oclc; }
     }).get().join(',');
-    var uri = '/caching/google.json?ids=' + encodeURIComponent(ids);
+    
+    var _uri = $('#virtual-shelf-root').data('root').replace(/\/$/,'');
+    var uri = _uri + '/caching/google.json?ids=' + encodeURIComponent(ids);
     
     function googleResults(data) {
       that.each(function() {
@@ -56,7 +59,7 @@ $(document).ready(function() {
             backgroundImage: 'url(' + url + ')',
             backgroundSize: 'contain'
           });
-          that.find('.generic-cover-container').replaceWith(new_div);
+          that.find('.no-cover-container').replaceWith(new_div);
         }
       });
     }
@@ -74,7 +77,7 @@ $(document).ready(function() {
   function onNewPageFunctions() { 
     $('.title-overlay').textfill({ maxFontPixels: 12 });
     $('.thumbnail').qTipLoader();
-    $('.thumbnail:has(.generic-cover-container)').checkGenericCovers();
+    $('.thumbnail:has(.no-cover-container)').checkGenericCovers();
     $('div.cover-holder').redoThumbnailsforIE();
   }
   
