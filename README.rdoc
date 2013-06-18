@@ -1,13 +1,21 @@
 == VirtualShelf
 
-A Rails Engine for building virtual shelf browse applications for (Aleph based) library catalogs.
+A Ruby on Rails Engine for building virtual shelf browse applications for (Aleph based) library catalogs.
 
 == Description
 
-This engine provides a virtual shelf browse mechanism. 
+This engine provides a virtual shelf browse mechanism for library collections. A virtual shelf displays item covers or other images for records, organized as they would be on a library bookshelf (i.e., by call number sort). Given a +document_number+ as an entry point, this application creates a recordset "window" view of cover thumbnails. Users can then browse backwards or forwards through the catalog (by call number sort) to discover relevant items.
 
-<image src=https://github.com/kardeiz/virtual-shelf/blob/master/screenshot.png>
+{Screenshot}[https://github.com/kardeiz/virtual-shelf/blob/master/screenshot.png]
 
+== Requirements
+
+* Ruby 1.8+
+* Ruby on Rails ~> 3.2.13
+
+This engine was designed for use with an Ex Libris Aleph library catalog, and the +rake+ tasks provided to load existing catalog data can only be used with Aleph databases. However, all other database and application configuration is generic. You should be able to use this engine with any catalog system if you load your data yourself.
+
+The instructions below assume a Linux operating system, but the engine should work elsewhere as well.
 
 == Installation and Initial Configuration
 
