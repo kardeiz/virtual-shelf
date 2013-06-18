@@ -63,7 +63,7 @@ Next, copy over the database migration files (assuming you have added the gems n
 
 Take a look at +config/initializers/virtual_shelf_initialize.rb+ and reset config values to ones appropriate for your catalog. Some of these options will be described in more detail below (e.g., +config.thumbnails_base_url+).
 
-== Load Records from Aleph Catalog Database
+== Loading Records from Aleph Catalog Database
 
 Ensure you have set the appropriate table and field names in +config/initializers/virtual_shelf_initialize.rb+.
 
