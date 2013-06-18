@@ -11,12 +11,12 @@ module VirtualShelf
         insert_into_file 'config/routes.rb', 
           %Q{\n  mount VirtualShelf::Engine => "/"},
           :after => /.*?\.routes\.draw do\n/
-        
+      end
+      
+      def write_lines_to_application
         insert_into_file 'config/application.rb', 
           %Q{\nrequire 'virtual_shelf'\nENV['NLS_LANG'] ||= "AMERICAN_AMERICA.UTF8"\n}, 
           :after => /require 'rails\/all'\n/
-        
-        
       end
       
     end
