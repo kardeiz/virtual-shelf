@@ -2,7 +2,7 @@
 
 A virtual shelf browse application for (Aleph) library catalogs as a Rails Engine.
 
-== Installation and Configuration
+== Installation and Initial Configuration
 
 <em>Note 1: these instructions assume that you will be creating a new Rails application to use with this engine. This engine can be used with an existing Rails application, but doing so will require manual changes to +routes.rb+ to change the mount path.</em>
 
@@ -10,19 +10,21 @@ A virtual shelf browse application for (Aleph) library catalogs as a Rails Engin
 
 First, create a new Rails application:
 
-  $ rails new MyApp
+  $ rails new my_app
 
 The VirtualShelf engine requires Rails ~> 3.2.13, but will probably work with other versions.
 
 Enter your Rails app directory and take a look at your application files:
 
-  $ cd MyApp
+  $ cd my_app
 
 Edit your +Gemfile+ by adding this line at the end of the file
 
   gem 'virtual-shelf', :git => 'git://github.com/kardeiz/virtual-shelf.git'
 
-You will also want to install gems for your database connection (e.g., 'mysql2' or 'sqlite3')
+You will also want to install gems for your database connection, e.g.:
+  gem 'mysql2'
+  gem 'sqlite3'
 
 Save your file and install your gems:
 
@@ -32,16 +34,32 @@ Next, initialize the engine:
 
   $ rails generate virtual_shelf:initialize
 
-This command copies over an initialization file to +config/initializers/virtual_shelf_initialize.rb+, adds a line to +config/routes.rb+ to mount the engine at the document root, and loads the engine files in +config/application.rb+.
+This command copies over an initialization file to +config/initializers/virtual_shelf_initialize.rb+, adds a line to +config/routes.rb+ to mount the engine at the document root, and adds a line to load the engine files in +config/application.rb+.
 
 Next, copy over the database migration files (assuming you have added the gems necessary for your database connection and have set up +config/database.yml+ as needed), and run the migrations:
 
   $ rake virtual_shelf:install:migrations
   $ rake db:migrate
 
-Take a look at +config/initializers/virtual_shelf_initialize.rb+ and reset config values to ones appropriate for your catalog. 
+Take a look at +config/initializers/virtual_shelf_initialize.rb+ and reset config values to ones appropriate for your catalog. Some of these options will be described in more detail below (e.g., +config.thumbnails_base_url+).
 
-Set up +config/database.yml+ to connect to your Aleph catalog database, naming the connection +oracle_db+. You will probably need to add the 'ruby-oci8' and 'activerecord-oracle_enhanced-adapter' gems to your +Gemfile+.
+== Load Records from Aleph Catalog Database
+
+Ensure you have set the appropriate table and field names in +config/initializers/virtual_shelf_initialize.rb+.
+
+In your +Gemfile+, add gems for the Oracle connection, e.g.:
+
+  gem 'ruby-oci8'
+  gem 'activerecord-oracle_enhanced-adapter'
+
+In +config/database.yml+, add configuration settings for your Aleph catalog database connection, naming the connection +oracle_db+. It should look something like this:
+
+  oracle_db:
+    database: servername.whatever:1521/aleph21
+    pool: 5
+    timeout: 5000
+    username: username
+    password: password
 
 Assuming everything is configured correctly, you can then load your catalog records into the VirtualShelf database:
 
@@ -51,9 +69,11 @@ This task will take a long time (hours), due mostly to a non-conventional join o
 
 Note that there is also a +load_recent_records+ task that will load all records created in the last week. You may wish to schedule this as a weekly +cron+ task.
 
+== Setting up Cover Thumbnails
+
 This application is designed to use the Open Library Cover thumbnails, made available via {their website}[http://openlibrary.org/dev/docs/api/covers]. This application assumes the use of the "medium" sized thumbnails, although other sizes could be made to work with some style changes.
 
-Download the covers and place them on an accessible server (can be separate from this application). Point the application to the location of your covers by setting the appropriate value for +config.thumbnails_base_url+ in +config/initializers/virtual_shelf_initialize.rb+.
+Download the covers and place them on an accessible server (can be separate from this application). Point the application to the location of your covers by setting the appropriate value for +config.thumbnails_base_url+ in +config/initializers/virtual_shelf_initialize.rb+. Note that +cid_tag+ refers to the assigned thumbnail ID. This block uses a Ruby +slice+ operation on a +String+: refer to the {Ruby documentation}[http://ruby-doc.org/core-2.0/String.html#method-i-slice] for more information. 
 
 Download and unzip the Open Library mappings TSV file (from their website). Then run:
 
@@ -61,17 +81,23 @@ Download and unzip the Open Library mappings TSV file (from their website). Then
 
 This process will take a long time. It may be faster to convert the TSV file into an appropriately manipulated CSV file to load directly into your database.
 
+== Running the Application
+
 Assuming everything has worked so far, you can visit your virtual catalog by running
 
   $ rails server
 
 and visiting localhost:3000/records/<document number> in your browser. If you see an error about not finding a class, try adding <tt>config.cache_store = :null_store</tt> to your +config/environments/development.rb+ file.
 
+== Loading as an Iframe
+
 You will notice that these pages lack any branding. This is because (at TCU), the VirtualShelf application is configured to load within an iframe within library catalog pages.
 
 To load the VirtualShelf application in a similar manner for your catalog, add the following line to the appropriate template file:
 
-  <script src="<your site's url>/virtual_shelf/catalog_load.js" type="text/javascript"></script>
+  <script src="<your site's url>/virtual_shelf/catalog/load.js" type="text/javascript"></script>
+
+This file sets up a JQuery UI modal and handles a click event (loading page as an iframe in this modal).
 
 You will also want to add a link to trigger the iframe load/display as follows:
 
@@ -83,7 +109,9 @@ where +document_number+ is generated dynamically by your catalog system.
 
 This application comes with no warranty, although you are welcome to open an issue at any time.
 
-This application uses generic cover icons from Font Awesome. These can be overridden by placing appropriately named files in +app/assets/images/virtual_shelf/+.
+This application uses generic cover icons from {Font Awesome}[http://fortawesome.github.io/Font-Awesome/]. These can be overridden by placing appropriately named files in +app/assets/images/virtual_shelf/+.
+
+This application contains a controller and JavaScript to load cover thumbnails from the Google Books API. It is your responsibility to ensure that your application complies with the {Google Books Terms of Service}[https://developers.google.com/books/terms].
 
 Pull requests are welcome, especially if you are a Rails developer and notice areas for improvement.
 
