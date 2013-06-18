@@ -13,7 +13,7 @@ This engine provides a virtual shelf browse mechanism for library collections. A
 * Ruby 1.8+
 * Ruby on Rails ~> 3.2.13
 
-This engine was designed for use with an Ex Libris Aleph library catalog, and the +rake+ tasks provided to load existing catalog data can only be used with Aleph databases. However, all other database and application configuration is generic. You should be able to use this engine with any catalog system if you load your data yourself.
+This engine was designed for use with an Ex Libris Aleph library catalog, and the +rake+ tasks provided to load existing catalog data can only be used with Aleph databases. However, most other database and application configuration is generic. You should be able to use this engine with any catalog system if you load your data yourself.
 
 The instructions below assume a Linux operating system, but the engine should work elsewhere as well.
 
