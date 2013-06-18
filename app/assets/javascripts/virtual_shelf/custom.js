@@ -51,8 +51,11 @@ $(document).ready(function() {
         var isbn = that.data('isbn') == null ? null : "ISBN:" + that.data('isbn');
         var oclc = that.data('oclc') == null ? null : "OCLC:" + that.data('oclc');
         if (data[isbn] || data[oclc]) {
-          var url = '/caching/passthrough?url=' + encodeURIComponent(data[isbn] || data[oclc]);
-          var new_div = $('<div class="cover-holder has-ol-cover"/>').css({ backgroundImage: 'url(' + url + ')', backgroundSize: 'contain' });
+          var url = data[isbn] || data[oclc];
+          var new_div = $('<div class="cover-holder has-cover"/>').css({
+            backgroundImage: 'url(' + url + ')',
+            backgroundSize: 'contain'
+          });
           that.find('.generic-cover-container').replaceWith(new_div);
         }
       });
@@ -60,35 +63,6 @@ $(document).ready(function() {
     
     var googleGet = $.get(uri)
     googleGet.done(googleResults);
-    googleGet.always(that.checkGenericCoversItunes);
-  }
-  
-  $.fn.checkGenericCoversItunes = function() {
-    $(this).each(function() {    
-      var that = $(this);
-      
-      function itunesGet(data) {
-        if (data && data.results && data.results[0] && data.results[0].artworkUrl100) {
-          var _url = data.results[0].artworkUrl100.replace("100x100-75.jpg","200x200-75.jpg");
-          var url = '/caching/passthrough?url=' + encodeURIComponent(_url);
-          var new_div = $('<div class="cover-holder has-ol-cover"/>').css({ backgroundImage: 'url(' + url + ')', backgroundSize: 'contain' });
-          that.find('.generic-cover-container').replaceWith(new_div);
-        }
-      }
-      
-      var format = that.data('title-with-format') == null ? null : that.data('title-with-format').match(/\[[^\]]+\]/);
-      var title = that.data('title');
-      var entity = format == "[VIDEO RECORDING]" ? "movie" : format == "[AUDIO RECORDING]" ? "album" : null;
-      var year = that.data('date');
-      if (format && title && entity && year) {
-        var uri = 'https://itunes.apple.com/search?term=' + encodeURIComponent('"' + title + '"') + '&entity=' + entity + '&releaseYearTerm=' + year;
-        $.ajax({
-          url: uri,
-          dataType: "jsonp",
-          success: itunesGet
-        });
-      }    
-    });  
   }
   
   $.fn.redoThumbnailsforIE = function () {
@@ -103,8 +77,6 @@ $(document).ready(function() {
     $('.thumbnail:has(.generic-cover-container)').checkGenericCovers();
     $('div.cover-holder').redoThumbnailsforIE();
   }
-  
-  onNewPageFunctions();
   
   $('body').on("click", '.arrow-left', function(e) {
     var href = $(this).attr("href");
@@ -137,7 +109,10 @@ $(document).ready(function() {
         var ul = $('<ul class="thumbnails"/>').appendTo(new_slide);
         $.each(data.slide.thumbnails, function (i,v) {
           var li = $('<li class="span2"/>').appendTo(ul);
-          var a = $('<a/>').attr({ href: v.link_href, target: "_top" }).data(v.link_data).addClass(v.link_class).appendTo(li);
+          var a = $('<a/>').attr({ 
+            href: v.link_href,
+            target: "_top"
+          }).data(v.link_data).addClass(v.link_class).appendTo(li);
           if (v.cover_style) {
             $('<div class="cover-holder has-cover" style="' + v.cover_style + '"/>').appendTo(a);
           } else {
@@ -158,5 +133,6 @@ $(document).ready(function() {
     };  
   }
   
+  onNewPageFunctions();
   
 });
