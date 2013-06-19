@@ -72,7 +72,7 @@ In your +Gemfile+, add gems for the Oracle connection, e.g.:
   gem 'ruby-oci8'
   gem 'activerecord-oracle_enhanced-adapter'
 
-and run <tt>bundle install</tt>
+and run <tt>bundle install</tt>.
 
 In +config/database.yml+, add configuration settings for your Aleph catalog database connection, naming the connection +oracle_db+. It should look something like this:
 
