@@ -17,8 +17,9 @@ module VirtualShelf
       :title_statement,
       :is_serial?
     ]
-
-    delegate *z13u_methods, :to => :z13u, :prefix => true, :allow_nil => true
+    z13u_delegate_options = { :to => :z13u, :prefix => true, :allow_nil => true }    
+    delegate *(z13u_methods << z13u_delegate_options)
+     
     delegate :year, :to => :z13, :prefix => true, :allow_nil => true
    
     scope :include_helper_tables, includes([:z13u, :z13])
