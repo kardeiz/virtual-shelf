@@ -37,7 +37,7 @@ module VirtualShelf
       _z30s = VirtualShelf::Z30.for_z11(set.select(:z11_doc_number).to_sql).all
       return nil if set.empty?      
       yield set.all, _z30s
-      iterator(set.last.z11_rec_key, limiter).loop(limiter, &blk)
+      iterator(set.last.z11_rec_key, limiter).loop(limiter, &blk) if limiter
     end
         
     def call_number
