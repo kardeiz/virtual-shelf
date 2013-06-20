@@ -16,7 +16,7 @@ namespace :virtual_shelf do
   end
   
   task :load_recent_records => :environment do
-    VirtualShelf::Z11.lcb_items.recent_items.include_helper_tables.find_loop(nil) do |load_records, _z30s|
+    VirtualShelf::Z11.lcb_items.recent_items.include_helper_tables.loop(nil) do |load_records, _z30s|
       ActiveRecord::Base.transaction do
         load_records.each do |lr|          
           _z30 = _z30s.detect{|x| x.key == lr.document_number}
