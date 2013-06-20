@@ -106,5 +106,5 @@ module VirtualShelf
       end      
     end
     
-  end
+  end if Rails.configuration.database_configuration["oracle_db"]
 end

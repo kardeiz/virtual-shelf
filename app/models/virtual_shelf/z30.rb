@@ -23,5 +23,5 @@ module VirtualShelf
       material_code.blank? ? nil : material_code.to_s.strip
     end
     
-  end
+  end if Rails.configuration.database_configuration["oracle_db"]
 end

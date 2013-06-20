@@ -12,5 +12,5 @@ module VirtualShelf
       z13_year
     end
     
-  end
+  end if Rails.configuration.database_configuration["oracle_db"]
 end
