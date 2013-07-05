@@ -2,7 +2,7 @@ $(document).ready(function() {
   
   var do_it; $(window).on("resize", function() {
     clearTimeout(do_it);
-    doit = setTimeout(function() { 
+    do_it = setTimeout(function() { 
       $('.title-overlay').textfill({
         maxFontPixels: 12
       });
