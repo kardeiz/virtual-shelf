@@ -27,7 +27,7 @@ module VirtualShelf
     scope :lcb_items, lambda { where("z11_rec_key like 'LCB%'") }
 
     scope :recent_items, lambda {
-      joins(:z13).where("z13_update_date > (?)", (1.week.ago).strftime("%Y%m%d"))
+      joins(:z13).where("z13_update_date > (?)", (8.days.ago).strftime("%Y%m%d"))
     }
     
     scope :iterator, lambda {|x,y| where("z11_rec_key > ?", x).order("z11_rec_key asc").limit(y) }  
