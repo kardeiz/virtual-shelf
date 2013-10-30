@@ -14,13 +14,13 @@ namespace :virtual_shelf do
   
   def load_joined_csv(files)
     return if File.exists?(files['zall'])
-    bash = %Q{ 
+    _bash = %Q{
       join -t $'\\t' -1 1 -2 1 -a 1 
       <(sort #{files['z11']}) 
       <(sort -u -t $'\\t' -k1,1 #{files['z30']}) 
       > #{files['zall']}
     }.strip.gsub(/\s+/,' ')
-    system("bash", "-c", bash)
+    system("bash", "-c", _bash)
   end
   
   def file_loads(update = false)
@@ -44,7 +44,7 @@ namespace :virtual_shelf do
       while r = cursor.fetch do 
         csv << r.map{|i| i.nil? ? '\N' : i }
       end
-    end unless File.exists?(file)
+    end # unless File.exists?(file)
   end
   
   def _load_table(file, table, mappings)
