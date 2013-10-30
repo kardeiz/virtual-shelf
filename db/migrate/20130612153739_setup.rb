@@ -2,7 +2,7 @@ class Setup < ActiveRecord::Migration
 
   def up
   
-    create_table "virtual_shelf_covers", :force => true do |t|
+  create_table "virtual_shelf_covers", :force => true do |t|
     t.integer  "cid",                      :null => false
     t.datetime "created_at",               :null => false
     t.datetime "updated_at",               :null => false
