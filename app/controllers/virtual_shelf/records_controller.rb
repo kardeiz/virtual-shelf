@@ -14,7 +14,7 @@ module VirtualShelf
       @records = record.set_and_cache_records_window(session[:exclude_periodicals])
         
       set_session_params    
-      cache_records_before_and_after_async(@records)
+      # cache_records_before_and_after_async(@records)
       
       respond_to do |format|
         format.html
@@ -24,7 +24,7 @@ module VirtualShelf
     def before    
       record = Record.find_and_cache_by_document_number_unscoped!(params[:id])      
       @records = record.set_and_cache_records_before(session[:exclude_periodicals])      
-      cache_records_before_and_after_async(@records)
+      # cache_records_before_and_after_async(@records)
       
       respond_to do |format|
         format.html {
@@ -36,7 +36,7 @@ module VirtualShelf
     def after      
       record = Record.find_and_cache_by_document_number_unscoped!(params[:id])      
       @records = record.set_and_cache_records_after(session[:exclude_periodicals])      
-      cache_records_before_and_after_async(@records)
+      # cache_records_before_and_after_async(@records)
       
       respond_to do |format|
         format.html {
@@ -52,22 +52,20 @@ module VirtualShelf
     end
     
     def cache_records_before_and_after_async(records)
-      cache_records_before_async(records.first)
-      cache_records_after_async(records.last)
+      background do
+        cache_records_before_async(records.first)
+        cache_records_after_async(records.last)
+      end
     end
     
-    def cache_records_before_async(record)
-      background do
-        records = record.records_before_default(session[:exclude_periodicals])
-        create_cache_unless_exists("records_before_#{record.document_number}", records)
-      end
+    def cache_records_before_async(record)      
+      records = record.records_before_default(session[:exclude_periodicals])
+      create_cache_unless_exists("records_before_#{record.document_number}", records)
     end
     
     def cache_records_after_async(record)
-      background do
-        records = record.records_after_default(session[:exclude_periodicals])
-        create_cache_unless_exists("records_after_#{record.document_number}", records)
-      end
+      records = record.records_after_default(session[:exclude_periodicals])
+      create_cache_unless_exists("records_after_#{record.document_number}", records)
     end
     
     def create_cache_unless_exists(cache_key, records)

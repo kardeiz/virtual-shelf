@@ -4,7 +4,7 @@ module VirtualShelf
     private
     
     def exp
-      Record.exp
+      @@exp ||= { :expires_in => VirtualShelf.config.cache_timeout }
     end
   
     def send_http_response_data(response)
