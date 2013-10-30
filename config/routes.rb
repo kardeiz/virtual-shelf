@@ -1,6 +1,7 @@
 VirtualShelf::Engine.routes.draw do
 
-  get 'caching/google'
+  get 'caching/books'
+  get 'caching/thumbnails'
   
   resources :records, :only => [:show] do
     get 'before', :on => :member

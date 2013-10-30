@@ -3,69 +3,82 @@ require 'csv'
 namespace :virtual_shelf do
   
   task :load_records => :environment do
-    VirtualShelf::Record.delete_all
-    VirtualShelf::Z11.include_helper_tables.lcb_items.order("z11_rec_key asc").loop(1000) do |load_records, _z30s|
-      ActiveRecord::Base.transaction do
-        load_records.each do |lr|
-          _z30 = _z30s.detect{|x| x.key == lr.document_number}
-          create_record(lr, _z30)  
-        end
-      end
-      puts "Record.count = #{VirtualShelf::Record.count}"
-    end
+    require_relative '../virtual_shelf/load_helpers'
+    file_loads
   end
   
   task :load_recent_records => :environment do
-    VirtualShelf::Z11.lcb_items.recent_items.include_helper_tables.loop(nil) do |load_records, _z30s|
-      ActiveRecord::Base.transaction do
-        load_records.each do |lr|          
-          _z30 = _z30s.detect{|x| x.key == lr.document_number}
-          create_record(lr, _z30)
-        end
-      end
-    end
-    puts "Record.count = #{VirtualShelf::Record.count}"
+    require_relative '../virtual_shelf/load_helpers'
+    file_loads(true)
   end
   
-  task :load_covers => :environment do  
-    file = ENV['filename']
-    next unless file
-    
+  def load_joined_csv(files)
+    return if File.exists?(files['zall'])
+    bash = %Q{ 
+      join -t $'\\t' -1 1 -2 1 -a 1 
+      <(sort #{files['z11']}) 
+      <(sort -u -t $'\\t' -k1,1 #{files['z30']}) 
+      > #{files['zall']}
+    }.strip.gsub(/\s+/,' ')
+    system("bash", "-c", bash)
+  end
+  
+  def file_loads(update = false)
+    files = file_names(update)
+    load_csv(files['z11'], VirtualShelf::SqlHelper.load_records(update))
+    load_csv(files['z30'], VirtualShelf::SqlHelper.load_supplements(update))
+    load_joined_csv(files)
+    load_table(files['zall'], 'virtual_shelf_records_1', record_mappings, update)
+  end
+  
+  def file_names(update)
+    files = %w{ z11 z30 zall }.inject({}) do |h, x|
+      h[x] = File.join([
+        Rails.root, 'tmp', "#{!update ? x : x + '_recent'}.txt"
+      ]); h
+    end
+  end
+  
+  def load_csv(file, cursor)
+    CSV.open(file, 'w', :col_sep => "\t") do |csv|
+      while r = cursor.fetch do 
+        csv << r.map{|i| i.nil? ? '\N' : i }
+      end
+    end unless File.exists?(file)
+  end
+  
+  def _load_table(file, table, mappings)
+    execute_sql(%Q{
+      LOAD DATA LOCAL INFILE '#{file}' IGNORE
+      INTO TABLE #{table}
+      FIELDS OPTIONALLY ENCLOSED BY '"'
+      (#{mappings.join(", ")})
+    }.strip)
+  end
+  
+  def load_table(file, table, mappings, update)
+    return _load_table(file, table, mappings) unless update
+    setters = mappings[1..-1].map do |m|
+      "#{m} = VALUES(#{m})"
+    end.join(', ')
     ActiveRecord::Base.transaction do
-      CSV.foreach(file, {:col_sep => "\t"}) do |row|
-        type = if row[0] == 'isbn'
-          'VirtualShelf::IsbnCover'
-        elsif row[0] == 'oclc'
-          'VirtualShelf::OclcCover'
-        end
-        
-        Cover.create do |cover|
-          cover.cid = row[3].to_i
-          cover.id_name = type
-          cover.id_value = row[1]
-        end if type
-      end
+      execute_sql("CREATE TEMPORARY TABLE temp_table LIKE #{table}")
+      _load_table(file, 'temp_table', mappings)
+      execute_sql(%Q{
+        INSERT INTO #{table}
+        SELECT * FROM temp_table
+        ON DUPLICATE KEY UPDATE #{setters}
+      }.strip.gsub(/\s+/,' '))
+      execute_sql("DROP TEMPORARY TABLE temp_table")
     end
   end
   
-  
-  
-  def create_record(lr, _z30)
-    VirtualShelf::Record.create do |nr, _z30|        
-      nr.call_number = lr.call_number
-      nr.call_number_sort = lr.call_number_for_sort
-      nr.document_number = lr.document_number
-      nr.isbn = lr.z13u_isbn_cleaned
-      nr.oclc = lr.z13u_oclc_cleaned
-      nr.contents = lr.z13u_contents_cleaned
-      nr.summary = lr.z13u_summary_cleaned
-      nr.title = lr.z13u_title_statement
-      nr.is_serial = lr.z13u_is_serial?
-      nr.year = lr.z13_year
-      nr.collection_code = _z30.collection_code unless _z30.nil?
-      nr.material_code = _z30.material_code unless _z30.nil?
-    end
+  def record_mappings
+    %w{ document_number call_number_sort call_number year isbn oclc title summary contents is_serial material_code collection_code call_number_type }
   end
   
+  def execute_sql(sql)
+    ActiveRecord::Base.connection.execute(sql)
+  end  
   
 end

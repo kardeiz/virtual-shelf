@@ -5,59 +5,86 @@ module VirtualShelf
   
     def show
     
-      @record = Rails.cache.fetch("document_#{params[:id]}", :expires_in => VirtualShelf.config.cache_timeout) do
-        begin
-          Record.find_by_document_number!(params[:id])
-        rescue ActiveRecord::RecordNotFound
-          render(:action => 'error', :locals => { :document_number => params[:id] }) and return
-        end
-      end
+      record = Record.find_and_cache_by_document_number!(params[:id])
       
-      session[:exclude_periodicals] = !(params[:include_periodicals] == '1')    
-      session[:document_number] = params[:id]
+      render(:action => 'error', :locals => {
+        :document_number => params[:id]
+      }) and return if record.nil?
       
-      @records = Rails.cache.fetch("records_window_#{params[:id]}", :expires_in => VirtualShelf.config.cache_timeout) do
-        @record.records_window(7, 7, session[:exclude_periodicals])
-      end
+      @records = record.set_and_cache_records_window(session[:exclude_periodicals])
+        
+      set_session_params    
+      cache_records_before_and_after_async(@records)
       
       respond_to do |format|
-        format.html # show.html.erb
-        format.json { render :json => @records }
+        format.html
       end
     end
 
-    def before
-    
-      @record = Rails.cache.fetch("document_#{params[:id]}", :expires_in => VirtualShelf.config.cache_timeout) do
-        Record.find_by_document_number!(params[:id])
-      end
-      
-      @records = Rails.cache.fetch("records_before_#{params[:id]}", :expires_in => VirtualShelf.config.cache_timeout) do
-        Record.exclude_periodicals(session[:exclude_periodicals]).records_before(@record.call_number_sort,15).to_a.reverse
-      end
+    def before    
+      record = Record.find_and_cache_by_document_number_unscoped!(params[:id])      
+      @records = record.set_and_cache_records_before(session[:exclude_periodicals])      
+      cache_records_before_and_after_async(@records)
       
       respond_to do |format|
-        format.html #{ render 'show' }
-        format.json { render :json => view_context.json_builder(@records, 'before') }
-      end
-    
+        format.html {
+          conditional_response(@records.nil?, params[:js])     
+        }
+      end    
     end
     
-    def after
-    
-      @record = Rails.cache.fetch("document_#{params[:id]}", :expires_in => VirtualShelf.config.cache_timeout) do
-        Record.find_by_document_number!(params[:id])
-      end
-      
-      @records = Rails.cache.fetch("records_after_#{params[:id]}", :expires_in => VirtualShelf.config.cache_timeout) do
-        Record.exclude_periodicals(session[:exclude_periodicals]).records_after(@record.call_number_sort,15).to_a
-      end
+    def after      
+      record = Record.find_and_cache_by_document_number_unscoped!(params[:id])      
+      @records = record.set_and_cache_records_after(session[:exclude_periodicals])      
+      cache_records_before_and_after_async(@records)
       
       respond_to do |format|
-        format.html #{ render 'show' }
-        format.json { render :json => view_context.json_builder(@records, 'after') }
-      end
-    
+        format.html {
+          conditional_response(@records.nil?, params[:js])
+        }
+      end    
     end
+    
+    def conditional_response(records_nil, params_js)
+      return redirect_to :back if records_nil
+      return render(:action => :show, :layout => false) if params_js
+      render :show
+    end
+    
+    def cache_records_before_and_after_async(records)
+      cache_records_before_async(records.first)
+      cache_records_after_async(records.last)
+    end
+    
+    def cache_records_before_async(record)
+      background do
+        records = record.records_before_default(session[:exclude_periodicals])
+        create_cache_unless_exists("records_before_#{record.document_number}", records)
+      end
+    end
+    
+    def cache_records_after_async(record)
+      background do
+        records = record.records_after_default(session[:exclude_periodicals])
+        create_cache_unless_exists("records_after_#{record.document_number}", records)
+      end
+    end
+    
+    def create_cache_unless_exists(cache_key, records)
+      Rails.cache.write(cache_key, records, exp) unless Rails.cache.exist?(cache_key)
+    end
+    
+    def background(&block)
+      Thread.new do
+        yield
+        ActiveRecord::Base.connection.close
+      end
+    end
+    
+    def set_session_params      
+      session[:exclude_periodicals] = !(params[:include_periodicals] == '1')    
+      session[:document_number] = params[:id]
+    end
+    
   end
 end

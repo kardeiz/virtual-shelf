@@ -6,10 +6,7 @@ module VirtualShelf
 
     def url
       cid_tag = cid.blank? ? nil : cid.to_s.rjust(10,"0")
-      if cid_tag
-        url_string = VirtualShelf.config.thumbnails_base_url.call(cid_tag)
-        # "/caching/passthrough?url=#{ URI.escape(url_string) }"
-      end
+      VirtualShelf.config.thumbnails_base_url.call(cid_tag) if cid_tag
     end
     
   end
