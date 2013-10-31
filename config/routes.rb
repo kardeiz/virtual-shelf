@@ -3,10 +3,8 @@ VirtualShelf::Engine.routes.draw do
   get 'caching/books'
   get 'caching/thumbnails'
   
-  resources :records, :only => [:show] do
-    get 'before', :on => :member
-    get 'after', :on => :member
-  end
+  get 'records/:id(/:page)', :to => 'records#show', :as => 'record'
+
 
 
 end

@@ -12,7 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require twitter/bootstrap
+//  require twitter/bootstrap
 //= require virtual_shelf/jquery-ui.min.js
 //= require virtual_shelf/jquery-migrate-1.1.1.min.js
 //= require virtual_shelf/jquery.qtip.min.js

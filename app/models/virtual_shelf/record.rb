@@ -3,9 +3,16 @@ module VirtualShelf
     self.table_name = "virtual_shelf_records_1"
     validates_uniqueness_of :document_number
   
-    has_one :cover_via_isbn, :class_name => 'IsbnCover', :primary_key => :isbn, :foreign_key => :id_value
-    has_one :cover_via_oclc, :class_name => 'OclcCover', :primary_key => :oclc, :foreign_key => :id_value
-    
+    has_one :cover_via_isbn, {
+      :class_name => 'IsbnCover', 
+      :primary_key => :isbn, 
+      :foreign_key => :id_value
+    }
+    has_one :cover_via_oclc, {
+      :class_name => 'OclcCover',
+      :primary_key => :oclc,
+      :foreign_key => :id_value
+    }
     delegate :url, :to => :cover, :prefix => true, :allow_nil => true
     
     PERIODICAL_IDS = %w{ PERBD PERCU PERDP PERIX PERMD PERMF PERNW PERON }
@@ -41,67 +48,13 @@ module VirtualShelf
     scope :prepared, lambda { |e, c|
       exclude_periodicals(e).same_call_number_type(c)
     }
-
-    def self.find_and_cache_by_document_number!(dn)
-      Rails.cache.fetch("document_#{dn}", exp) do
-        self.with_covers.find_by_document_number!(dn) rescue nil          
-      end
+    
+    def records_before(before, e)
+      Record.prepared(e, self.call_number_type).with_covers.records_before(self.call_number_sort, before).to_a.reverse
     end
     
-    def self.find_and_cache_by_document_number_unscoped!(dn)
-      Rails.cache.fetch("document_unscoped_#{dn}", exp) do
-        self.find_by_document_number!(dn) rescue nil          
-      end
-    end
-    
-    def self.exp
-      @@exp ||= { :expires_in => VirtualShelf.config.cache_timeout }
-    end
-
-    def set_and_cache_records_window(e)
-      Rails.cache.fetch("records_window_#{self.document_number}", Record.exp) do
-        self.records_window_default(e)
-      end
-    end
-
-    def set_and_cache_records_before(e)
-      Rails.cache.fetch("records_before_#{self.document_number}", Record.exp) do
-        self.records_before_default(e)
-      end
-    end
-
-    def set_and_cache_records_after(e)
-      Rails.cache.fetch("records_after_#{self.document_number}", Record.exp) do
-        self.records_after_default(e)
-      end
-    end
-
-    def records_window(before, after, e, c)
-      records_before(before, e, c) +
-      [self] + 
-      records_after(after, e, c)
-    end
-    
-    def records_before(before, e, c)
-      Record.prepared(e, c).with_covers.records_before(self.call_number_sort, before).to_a.reverse
-    end
-    
-    def records_after(after, e, c)
-      Record.prepared(e, c).with_covers.records_after(self.call_number_sort, after).to_a
-    end
-    
-    def records_window_default(e)
-      records_before(7, e, self.call_number_type) +
-      [self] + 
-      records_after(7, e, self.call_number_type)
-    end
-    
-    def records_before_default(e)      
-      records_before(15, e, self.call_number_type)
-    end
-    
-    def records_after_default(e)
-      records_after(15, e, self.call_number_type)
+    def records_after(after, e)
+      Record.prepared(e, self.call_number_type).with_covers.records_after(self.call_number_sort, after).to_a
     end
     
     def format

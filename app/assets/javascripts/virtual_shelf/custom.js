@@ -40,8 +40,11 @@ $(document).ready(function() {
         return isbn || oclc;
       }
     }).get();
-    var books_url = root + 'caching/books.json?ids=' + encodeURIComponent(ids.join(','));
-    $.get(books_url, googleResults)
+    
+    if (ids.length > 0) {
+      var books_url = root + 'caching/books.json?ids=' + encodeURIComponent(ids.join(','));
+      $.get(books_url, googleResults)
+    }
     
     function googleResults(data) {
       $.each(ids, function(i, o) {
@@ -65,16 +68,18 @@ $(document).ready(function() {
     $('.title-overlay').textfill({ maxFontPixels: 12 });
     $('.thumbnail').qTipLoader();
     $('div.cover-holder').redoThumbnailsforIE();
-    $('.thumbnail:has(.no-cover-container)').checkGenericCovers();    
+    // $('.thumbnail:has(.no-cover-container)').checkGenericCovers();    
   }
     
   $('body').on("click", '.arrow-left', function(e) {
     e.preventDefault();
+    $('.overlay').stop().fadeIn();
     $.get( $('.arrow-left').attr('href') + '?js=true', getNewPage('right', 'left'));
   });
   
   $('body').on("click", '.arrow-right', function(e) {
     e.preventDefault();
+    $('.overlay').stop().fadeIn();
     $.get( $('.arrow-right').attr('href') + '?js=true', getNewPage('left', 'right'));
   });
   
@@ -87,6 +92,7 @@ $(document).ready(function() {
       var new_slide = data.find('.slide')
         .css("position","absolute").addClass('hide')
         .appendTo('.thumbnails-div');
+      $('.overlay').stop().fadeOut();
       prev_slide.hide('slide', {direction: exit}, 1000, function() {
         prev_slide.remove();
       });

@@ -1,4 +1,4 @@
-<div style="text-align: center; margin-top:20px;">
+<div class="include-periodicals">
   <%= form_tag request.fullpath, :method => :get, :class => 'form-inline' do %>
     <label class="checkbox">
       <%= check_box_tag :include_periodicals, '1', params[:include_periodicals] == '1' %> Include periodicals in browsing (will reset browse page)

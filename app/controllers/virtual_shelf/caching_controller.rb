@@ -5,7 +5,7 @@ module VirtualShelf
   
     def books   
       render :nothing => true and return unless ids = params[:ids]
-      @result = Rails.cache.fetch("cover_cache_#{ids}", exp) do
+      @result = Rails.cache.fetch("books/#{ids}", cache_opts) do 
         get_books_from_google(ids)
       end    
       render :json => @result
@@ -13,7 +13,7 @@ module VirtualShelf
   
     def thumbnails
       render :nothing => true and return unless url_string = params[:url]
-      @response = Rails.cache.fetch("cover_file_cache_#{url_string}", exp) do
+      @response = Rails.cache.fetch("thumbnails/#{url_string}", cache_opts) do
         url = URI.parse(url_string)
         if url.host.include?('books.google.com')
           Net::HTTP.get_response(url) rescue nil
@@ -47,6 +47,10 @@ module VirtualShelf
         h
       end
     end  
+  
+    def cache_opts
+      @@_cache_opts ||= { :expires_in => VirtualShelf.config.cache_timeout }
+    end
   
   end
 end
