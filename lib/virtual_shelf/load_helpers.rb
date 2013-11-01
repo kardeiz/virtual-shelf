@@ -67,7 +67,7 @@ module VirtualShelf
     
     scope :recent_items, lambda {
       where do
-        z13_update_date.gteq (8.days.ago).strftime("%Y%m%d")
+        z13_update_date.gteq my{ (8.days.ago).strftime("%Y%m%d") }
       end
     }
   end if Rails.configuration.database_configuration["oracle_db"]
@@ -92,7 +92,7 @@ module VirtualShelf
     self.table_name = VirtualShelf.config.z30_table_name
     self.primary_key = 'z30_rec_key'
     scope :recent_items, lambda {
-      where{ z30_update_date.gteq (8.days.ago).strftime("%Y%m%d") }
+      where{ z30_update_date.gteq my{ (8.days.ago).strftime("%Y%m%d") } }
     }
     
     scope :for_supplements, lambda {
@@ -142,10 +142,16 @@ module VirtualShelf
       end
       
       def supplements_sql(update = false)
+        _z30 = if update
+          Z30.for_supplements.recent_items.to_sql
+        else Z30.for_supplements.to_sql end
         with_tables = [].push(Z103.for_supplements.to_sql)
-        with_tables.push(update ? Z30.for_supplements.recent_items.to_sql : Z30.for_supplements.to_sql)
-        sql = "with t1 as (#{with_tables[0]}), t2 as (#{with_tables[1]}) "
-        sql << %Q{
+        with_tables.push(_z30)
+        sql = %Q{
+          with t1 as (#{with_tables[0]}), 
+          t2 as (#{with_tables[1]})
+        }.strip.gsub(/\s+/,' ')
+        sql << ' ' << %Q{
           select t1.tcu01_key, t2.material_code, t2.collection_code, t2.call_number_type
           from t1 inner join t2 on t1.tcu50_key = t2.tcu50_key
         }.strip.gsub(/\s+/,' ')

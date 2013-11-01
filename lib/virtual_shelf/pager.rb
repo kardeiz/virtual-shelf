@@ -68,8 +68,8 @@ module VirtualShelf
     end
     
     def check_if_more_records_needed
-      get_more_records_before if before? && calc >= records_before.size
-      get_more_records_after if after? && calc >= records_after.size
+      get_more_records_before if before? && calc > records_before.size
+      get_more_records_after if after? && calc > records_after.size
     end
     
     def get_more_records_before

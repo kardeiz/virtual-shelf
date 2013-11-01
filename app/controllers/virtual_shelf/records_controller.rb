@@ -4,7 +4,6 @@ module VirtualShelf
   class RecordsController < ApplicationController
   
     def show
-
       set_session_params
       @page, id, e = [
         params[:page].to_i, params[:id], session[:exclude_periodicals]
