@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     virtual-shelf (0.0.2)
+      activerecord-import
       fastercsv
       jquery-rails
       rails (~> 3.2.13)
@@ -32,6 +33,8 @@ GEM
       activesupport (= 3.2.13)
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
+    activerecord-import (0.4.1)
+      activerecord (>= 3.0)
     activerecord-oracle_enhanced-adapter (1.4.2)
     activeresource (3.2.13)
       activemodel (= 3.2.13)

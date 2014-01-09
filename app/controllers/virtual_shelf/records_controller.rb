@@ -4,10 +4,8 @@ module VirtualShelf
   class RecordsController < ApplicationController
   
     def show
-      set_session_params
-      @page, id, e = [
-        params[:page].to_i, params[:id], session[:exclude_periodicals]
-      ]
+      @page, id = params[:page].to_i, params[:id]      
+      set_session_params; e = session[:exclude_periodicals]
       @records = begin
         VirtualShelf::Pager.new(id, @page, e).records_for_page
       rescue
@@ -33,9 +31,11 @@ module VirtualShelf
       })
     end
     
-    def set_session_params      
-      session[:exclude_periodicals] = !(params[:include_periodicals] == '1')    
-      session[:document_number] = params[:id]
+    def set_session_params
+      if @page.zero?
+        session[:exclude_periodicals] = !(params[:include_periodicals] == '1')
+        session[:document_number] = params[:id]
+      end
     end
     
   end

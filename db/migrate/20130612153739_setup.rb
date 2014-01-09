@@ -28,6 +28,7 @@ class Setup < ActiveRecord::Migration
       t.boolean  "is_serial"
       t.string   "year",             :limit => 4
       t.integer  "call_number_type", :limit => 1
+      t.string   "cid",              :limit => 10
     end
 
     add_index "virtual_shelf_records_1", ["call_number_sort", "call_number_type", "collection_code", "is_serial", "material_code"], :name => "index_virtual_shelf_records_multi_column"

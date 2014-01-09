@@ -2,6 +2,9 @@ module VirtualShelf
   class Record < ActiveRecord::Base
     self.table_name = "virtual_shelf_records_1"
     validates_uniqueness_of :document_number
+    attr_accessible :document_number, :call_number_sort, :call_number, :year,
+      :isbn, :oclc, :title, :summary, :contents, :is_serial, :material_code,
+      :collection_code, :call_number_type, :cid
   
     has_one :cover_via_isbn, {
       :class_name => 'IsbnCover', 
@@ -13,7 +16,14 @@ module VirtualShelf
       :primary_key => :oclc,
       :foreign_key => :id_value
     }
-    delegate :url, :to => :cover, :prefix => true, :allow_nil => true
+    
+    scope :set_index, lambda { |c|
+      return scoped if c == 0
+      _index = 'index_virtual_shelf_records_1_on_call_number_type, index_virtual_shelf_records_1_on_call_number_sort, index_virtual_shelf_records_multi_column'
+      from("#{quoted_table_name} use index(#{_index})")
+    }
+    
+    delegate :cid, :to => :cover, :prefix => true, :allow_nil => true
     
     PERIODICAL_IDS = %w{ PERBD PERCU PERDP PERIX PERMD PERMF PERNW PERON }
     
@@ -23,7 +33,7 @@ module VirtualShelf
     }
     
     scope :exclude_periodicals, lambda { |exclude|
-      return scoped unless exclude      
+      return scoped unless exclude
       where do
         ((collection_code.not_in PERIODICAL_IDS) | (collection_code.eq nil)) & 
         ((collection_code.not_eq nil) | (is_serial.eq false))
@@ -41,20 +51,16 @@ module VirtualShelf
       }.order{ call_number_sort.asc }.limit(_limit)
     }
     
-    scope :with_covers, lambda {
-      includes([:cover_via_isbn, :cover_via_oclc])
-    }
-    
     scope :prepared, lambda { |e, c|
-      exclude_periodicals(e).same_call_number_type(c)
+      exclude_periodicals(e).same_call_number_type(c).set_index(c)
     }
     
     def records_before(before, e)
-      Record.prepared(e, self.call_number_type).with_covers.records_before(self.call_number_sort, before).to_a.reverse
+      Record.prepared(e, self.call_number_type).records_before(self.call_number_sort, before).to_a #.reverse
     end
     
     def records_after(after, e)
-      Record.prepared(e, self.call_number_type).with_covers.records_after(self.call_number_sort, after).to_a
+      Record.prepared(e, self.call_number_type).records_after(self.call_number_sort, after).to_a
     end
     
     def format
@@ -80,7 +86,12 @@ module VirtualShelf
     end
     
     def has_cover?
-      !cover.nil?
+      !cid.nil?
+    end
+
+    def cover_url
+      cid_tag = cid.blank? ? nil : cid.to_s.rjust(10,"0")
+      VirtualShelf.config.thumbnails_base_url.call(cid_tag) if cid_tag
     end
 
     def cover_background_image
