@@ -4,7 +4,7 @@ module VirtualShelf
     validates_uniqueness_of :document_number
     attr_accessible :document_number, :call_number_sort, :call_number, :year,
       :isbn, :oclc, :title, :summary, :contents, :is_serial, :material_code,
-      :collection_code, :call_number_type, :cid
+      :collection_code, :call_number_type
   
     has_one :cover_via_isbn, {
       :class_name => 'IsbnCover', 
@@ -18,9 +18,12 @@ module VirtualShelf
     }
     
     scope :set_index, lambda { |c|
-      return scoped if c == 0
-      _index = 'index_virtual_shelf_records_1_on_call_number_type, index_virtual_shelf_records_1_on_call_number_sort, index_virtual_shelf_records_multi_column'
-      from("#{quoted_table_name} use index(#{_index})")
+      index = if [0, nil, 3].include?(c)
+        'index_virtual_shelf_records_1_multi_column'
+      else 
+        'index_virtual_shelf_records_1_on_call_number_type'
+      end      
+      from("#{quoted_table_name} use index(#{index})")
     }
     
     delegate :cid, :to => :cover, :prefix => true, :allow_nil => true
@@ -28,8 +31,11 @@ module VirtualShelf
     PERIODICAL_IDS = %w{ PERBD PERCU PERDP PERIX PERMD PERMF PERNW PERON }
     
     scope :same_call_number_type, lambda { |type|
-      return scoped unless type
       where(:call_number_type => type)
+    }
+    
+    scope :with_covers, lambda {
+       includes([:cover_via_isbn, :cover_via_oclc])
     }
     
     scope :exclude_periodicals, lambda { |exclude|
@@ -52,15 +58,19 @@ module VirtualShelf
     }
     
     scope :prepared, lambda { |e, c|
-      exclude_periodicals(e).same_call_number_type(c).set_index(c)
+      exclude_periodicals(e).same_call_number_type(c).set_index(c).with_covers
     }
     
     def records_before(before, e)
-      Record.prepared(e, self.call_number_type).records_before(self.call_number_sort, before).to_a #.reverse
+      Record.prepared(e, self.call_number_type).records_before(self.call_number_sort, before).to_a.reverse
     end
     
     def records_after(after, e)
       Record.prepared(e, self.call_number_type).records_after(self.call_number_sort, after).to_a
+    end
+    
+    def records_window(before, after, e)
+      records_before(before, e) + [self] + records_after(after, e)
     end
     
     def format
@@ -78,7 +88,7 @@ module VirtualShelf
     end
 
     def is_electronic_resource?
-      collection_code.nil?
+      collection_code.blank?
     end
 
     def cover
@@ -86,11 +96,11 @@ module VirtualShelf
     end
     
     def has_cover?
-      !cid.nil?
+      !cover_cid.blank?
     end
 
     def cover_url
-      cid_tag = cid.blank? ? nil : cid.to_s.rjust(10,"0")
+      cid_tag = cover_cid.blank? ? nil : cover_cid.to_s.rjust(10,"0")
       VirtualShelf.config.thumbnails_base_url.call(cid_tag) if cid_tag
     end
 
@@ -99,7 +109,9 @@ module VirtualShelf
     end
     
     def clean_call_number
-      call_number.gsub("$$a","").gsub("$$b"," ") if call_number.respond_to?(:gsub)
+      if call_number.respond_to?(:gsub)
+        call_number.gsub("$$a","").gsub("$$b"," ") 
+      end
     end
       
     def title_with_format

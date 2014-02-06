@@ -2,7 +2,7 @@ module VirtualShelf
   module RecordsHelper
   
     def link_class(document_number) 
-      if session[:document_number] && session[:document_number] == document_number
+      if session[:document_number] == document_number
         "current thumbnail"
       else "thumbnail" end
     end

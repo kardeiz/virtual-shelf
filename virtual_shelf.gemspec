@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
   s.add_dependency "jquery-rails"
   s.add_dependency "fastercsv"
   s.add_dependency "twitter-bootstrap-rails", "2.2.6"
-  s.add_dependency "activerecord-import"
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "therubyracer"

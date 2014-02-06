@@ -1,6 +1,4 @@
 require 'fastercsv'
-require "activerecord-import/base"
-ActiveRecord::Import.require_adapter('mysql2')
 
 module VirtualShelf
   
@@ -181,15 +179,14 @@ module VirtualShelf
       def do_load_records
         load_csv_for_oracle(files['records'], OracleConnection.load_records)
         load_csv_for_oracle(files['supplements'], OracleConnection.load_supplements)
-        #load_csv_for_mysql(files['isbns'], execute_sql(VirtualShelf::IsbnCover._select.to_sql))
-        #load_csv_for_mysql(files['oclcs'], execute_sql(VirtualShelf::OclcCover._select.to_sql))
-        create_load_files(files['records'], files['supplements'], files['isbns'], files['oclcs'], load_dir)
+        create_load_files(files['records'], files['supplements'], load_dir)
         load_from_split
       end
       
       def load_from_split
         ActiveRecord::Base.transaction do 
           Dir[File.join(load_dir, "x*")].each_with_index do |f,i|
+            puts File.basename(f)
             load_table(f, table, mappings)
           end
         end
@@ -202,25 +199,11 @@ module VirtualShelf
           end
         end
       end
-      
-      def load_csv_for_mysql(file, cursor)
-        FasterCSV.open(file, 'w', :col_sep => "\t") do |csv|
-          cursor.each do |r|
-            csv << r
-          end
-        end
-      end
        
-      def create_load_files(if1, if2, if3, if4, od)
+      def create_load_files(if1, if2, od)
         _bash = %Q{
-          join -t $'\\t' -1 1 -2 1 -a 1 -o auto
-          <(sort #{if1}) <(sort -u -t $'\\t' -k1,1 #{if2}) | 
-          sort -t $'\\t' -k5,5 |
-          join -t $'\\t' -1 5 -2 1 -a 1 -o auto - 
-          <(sort -u -t $'\\t' -k1,1 #{if3}) |
-          sort -t $'\\t' -k6,6 |
-          join -t $'\\t' -1 6 -2 1 -a 1 -e '\\N' -o auto - 
-          <(sort -u -t $'\\t' -k1,1 #{if4}) |
+          join -t $'\\t' -1 1 -2 1 -a 1 -e '\\N' -o auto
+          <(sort #{if1}) <(sort -u -t $'\\t' -k1,1 #{if2}) |
           (cd #{od}; split -l 10000)
         }.strip.gsub(/\s+/,' ')
         system("bash", "-c", _bash)
@@ -244,7 +227,6 @@ module VirtualShelf
           INTO TABLE #{_table}
           FIELDS OPTIONALLY ENCLOSED BY '"'
           (#{_mappings.join(", ")})
-          SET cid = COALESCE(@isbn_cid, @oclc_cid)
         }.strip)
       end
       
@@ -257,9 +239,9 @@ module VirtualShelf
       end 
            
       def mappings
-        %w{ oclc isbn document_number call_number_sort call_number year title
+        %w{ document_number call_number_sort call_number year isbn oclc title
         summary contents is_serial material_code collection_code
-        call_number_type @isbn_cid @oclc_cid }
+        call_number_type }
       end 
     
     end
@@ -276,19 +258,22 @@ module VirtualShelf
       end
       
       def update_supplements(cursor)
-        iterate_over_cursor(cursor) do |o|
-          o.uniq{|y| y.first}.each do |x|
-            update_supplement(x)
-          end
+        t = cursor_to_array(cursor)
+        t.uniq{|y| y.first}.each do |x|
+          update_supplement(x)
         end
       end
       
       def create_or_update_records(cursor)
-        cursor = OracleConnection.load_records(true)
-        iterate_over_cursor(cursor) do |o|
-          o.uniq{|y| y.first}.each do |x|
-            create_or_update_record(x)
-          end
+        t = cursor_to_array(cursor)
+        t.uniq{|y| y.first}.each do |x|
+          create_or_update_record(x)
+        end
+      end
+      
+      def cursor_to_array(cursor)
+        [].tap do |o|
+          while r = cursor.fetch do; o << r; end
         end
       end
       
@@ -305,19 +290,8 @@ module VirtualShelf
         record = VirtualShelf::Record.where({
           :document_number => keys.delete(:document_number)
         }).first_or_initialize
-        record.assign_attributes(keys)
-        record.update_attributes(:cid => record.cover_cid)
-      end
-      
-      
-      def iterate_over_cursor(cursor, els = [])
-        while r = cursor.fetch do
-          els << r
-          if els.size == 10000
-            yield els; els = []
-          end
-        end
-        yield els unless els.empty?
+        puts record.document_number
+        record.update_attributes(keys)
       end
       
       def record_mappings

@@ -29,16 +29,16 @@ module VirtualShelf
     def get_books_from_google(ids)
       uri = URI.parse(google_books_url(ids))
       response = Net::HTTP.get_response(uri) rescue nil
-      books_js_helper('_', response.body) if response
+      books_js_helper(response.body) if response
     end
     
     def google_books_url(ids)
       "http://books.google.com/books?jscmd=viewapi&callback=_&bibkeys=#{URI.escape(ids)}"
     end
     
-    def books_js_helper(callback, response)
-      js = "function #{callback}(data) { return data; }; return #{response}"
-      get_thumbnail_urls(ExecJS.exec js)
+    def books_js_helper(response)
+      parsed = JSON.parse(response.gsub(/^_\(/,'').gsub(/\);/,''))
+      get_thumbnail_urls(parsed)
     end
     
     def get_thumbnail_urls(hash)
@@ -49,7 +49,7 @@ module VirtualShelf
     end  
   
     def cache_opts
-      @@_cache_opts ||= { :expires_in => VirtualShelf.config.cache_timeout }
+      { :expires_in => VirtualShelf.config.cache_timeout }
     end
   
   end

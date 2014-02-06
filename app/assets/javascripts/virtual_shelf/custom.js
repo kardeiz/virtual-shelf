@@ -68,7 +68,7 @@ $(document).ready(function() {
     $('.title-overlay').textfill({ maxFontPixels: 12 });
     $('.thumbnail').qTipLoader();
     $('div.cover-holder').redoThumbnailsforIE();
-    // $('.thumbnail:has(.no-cover-container)').checkGenericCovers();    
+    $('.thumbnail:has(.no-cover-container)').checkGenericCovers();    
   }
     
   $('body').on("click", '.arrow-left', function(e) {
