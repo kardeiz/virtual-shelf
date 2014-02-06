@@ -2,6 +2,8 @@
 
 A Ruby on Rails Engine for building virtual shelf browse applications for (Aleph based) library catalogs.
 
+<em>Note: these instructions describe a previous version and need to be updated</em>
+
 == Description
 
 This engine provides a virtual shelf browse mechanism for library collections. A virtual shelf displays item covers or other images for records, organized as they would be on a library bookshelf (i.e., by call number sort). Given a +document_number+ as an entry point, this application creates a recordset "window" view of cover thumbnails. Users can then browse backwards or forwards through the catalog (by call number sort) to discover relevant items.
